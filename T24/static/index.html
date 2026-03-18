@@ -11,51 +11,37 @@
         html, body { height: 100%; width: 100%; font-family: 'DM Sans', sans-serif; background: #0d0d0f; }
         #mapa { height: 100%; width: 100%; }
 
-        /* ── Painel superior ── */
         #painel {
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
             z-index: 1000; display: flex; align-items: center; gap: 8px;
             filter: drop-shadow(0 4px 24px rgba(0,0,0,0.5));
         }
         #painel input {
-            width: 240px; padding: 12px 18px; border: none; border-radius: 12px 0 0 12px;
+            width: 280px; padding: 12px 18px; border: none; border-radius: 12px 0 0 12px;
             font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
             background: rgba(18,18,24,0.95); color: #f0f0f5; outline: none;
         }
         #painel input::placeholder { color: #444; }
-        #painel button.btn-buscar {
-            padding: 12px 18px; border: none; border-radius: 0 12px 12px 0;
+        #painel button {
+            padding: 12px 20px; border: none; border-radius: 0 12px 12px 0;
             background: #63b3ed; color: #0d0d0f; font-family: 'Syne', sans-serif;
             font-size: 13px; font-weight: 800; letter-spacing: 0.05em;
             cursor: pointer; transition: background 0.2s;
         }
-        #painel button.btn-buscar:hover { background: #90cdf4; }
+        #painel button:hover { background: #90cdf4; }
 
-        /* ── Toggles de camada ── */
-        .toggles {
-            display: flex; gap: 6px;
-        }
-        .toggle-btn {
-            padding: 10px 14px; border: none; border-radius: 10px;
-            font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800;
-            letter-spacing: 0.06em; cursor: pointer; transition: all 0.2s;
-            background: rgba(18,18,24,0.95); color: #555;
-        }
-        .toggle-btn.ativo { color: #0d0d0f; }
-        #toggle-bairros.ativo  { background: #63b3ed; }
-        #toggle-clusters.ativo { background: #68d391; }
-
-        /* ── Slider K ── */
+        /* Slider K */
         #k-wrap {
-            display: none; align-items: center; gap: 8px;
-            background: rgba(18,18,24,0.95); padding: 8px 14px; border-radius: 10px;
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(18,18,24,0.95); padding: 10px 14px; border-radius: 12px;
         }
-        #k-wrap.visivel { display: flex; }
-        #k-wrap label { font-size: 11px; color: #68d391; font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: 0.06em; white-space: nowrap; }
-        #k-slider { width: 80px; accent-color: #68d391; }
-        #k-val { font-size: 12px; color: #eee; font-weight: 700; min-width: 16px; }
+        #k-wrap label {
+            font-size: 11px; color: #68d391; font-family: 'Syne', sans-serif;
+            font-weight: 800; letter-spacing: 0.08em; white-space: nowrap;
+        }
+        #k-slider { width: 90px; accent-color: #68d391; cursor: pointer; }
+        #k-val { font-size: 13px; color: #eee; font-weight: 700; min-width: 18px; text-align: center; }
 
-        /* ── Status ── */
         #status {
             position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
             z-index: 1000; background: rgba(13,13,18,0.92); color: #888;
@@ -64,24 +50,21 @@
         }
         #status.oculto { opacity: 0; }
 
-        /* ── Legenda ── */
         #legenda {
             position: absolute; top: 80px; right: 20px; z-index: 1000;
             background: rgba(13,13,18,0.92); border-radius: 14px; padding: 14px 18px;
-            backdrop-filter: blur(12px); max-width: 210px;
+            backdrop-filter: blur(12px); max-width: 220px;
             max-height: calc(100vh - 120px); overflow-y: auto; display: none;
         }
         #legenda h3 {
             font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 800;
-            letter-spacing: 0.12em; color: #63b3ed; text-transform: uppercase; margin-bottom: 12px;
+            letter-spacing: 0.12em; color: #68d391; text-transform: uppercase; margin-bottom: 12px;
         }
-        #legenda h3.cluster-titulo { color: #68d391; }
         .legenda-item { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
         .legenda-cor { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
         .legenda-nome { font-size: 12px; color: #bbb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .legenda-count { font-size: 10px; color: #555; margin-left: auto; flex-shrink: 0; }
 
-        /* ── Loading ── */
         #loading {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
             z-index: 2000; display: none; flex-direction: column; align-items: center; gap: 14px;
@@ -94,7 +77,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         #loading p { color: #63b3ed; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; }
 
-        /* ── Leaflet overrides ── */
         .leaflet-control-zoom a { background: rgba(13,13,18,0.92) !important; color: #666 !important; border: none !important; }
         .leaflet-control-zoom a:hover { background: rgba(99,179,237,0.15) !important; color: #63b3ed !important; }
         .leaflet-control-attribution { display: none; }
@@ -108,18 +90,13 @@
 
 <div id="painel">
     <input type="text" id="inputCidade" placeholder="Ex: São Paulo, SP" value="Santa Rita do Sapucai" />
-    <button class="btn-buscar" onclick="buscarBairros()">BUSCAR</button>
-
-    <div class="toggles">
-        <button class="toggle-btn ativo" id="toggle-bairros"  onclick="toggleCamada('bairros')">BAIRROS</button>
-        <button class="toggle-btn"       id="toggle-clusters" onclick="toggleCamada('clusters')">CLUSTERS</button>
-    </div>
+    <button onclick="buscar()">BUSCAR</button>
 
     <div id="k-wrap">
         <label>K =</label>
         <input type="range" id="k-slider" min="2" max="30" value="15"
-               oninput="document.getElementById('k-val').textContent=this.value"
-               onchange="carregarClusters()">
+               oninput="document.getElementById('k-val').textContent = this.value"
+               onchange="buscar()">
         <span id="k-val">15</span>
     </div>
 </div>
@@ -130,7 +107,7 @@
 </div>
 
 <div id="legenda">
-    <h3 id="legenda-titulo">Bairros</h3>
+    <h3 id="legenda-titulo">Clusters</h3>
     <div id="legenda-lista"></div>
 </div>
 
@@ -151,12 +128,8 @@
     var mapa = L.map('mapa').setView([-22.2519, -45.7045], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(mapa);
 
-    var camadaBairros   = null;
-    var camadaClusters  = null;
-    var modoCamada      = 'bairros'; // 'bairros' | 'clusters'
-    var legendaData     = [];
+    var camada = null;
 
-    // ── Utilitários ───────────────────────────────────────────────────────────
     function cor(i) { return PALETA[i % PALETA.length]; }
 
     function mostrarStatus(msg, duracao = 3000) {
@@ -170,225 +143,93 @@
         document.getElementById('loading').style.display = show ? 'flex' : 'none';
     }
 
-    // ── Toggle de camada ──────────────────────────────────────────────────────
-    function toggleCamada(modo) {
-        modoCamada = modo;
+    function renderizarClusters(geojson) {
+        if (camada) mapa.removeLayer(camada);
 
-        document.getElementById('toggle-bairros').classList.toggle('ativo',  modo === 'bairros');
-        document.getElementById('toggle-clusters').classList.toggle('ativo', modo === 'clusters');
-        document.getElementById('k-wrap').classList.toggle('visivel',        modo === 'clusters');
-
-        if (camadaBairros)  mapa.removeLayer(camadaBairros);
-        if (camadaClusters) mapa.removeLayer(camadaClusters);
-
-        if (modo === 'bairros' && camadaBairros) {
-            camadaBairros.addTo(mapa);
-            renderLegenda('bairros');
-        } else if (modo === 'clusters') {
-            carregarClusters();
-        }
-    }
-
-    // ── Geometria ─────────────────────────────────────────────────────────────
-    function eqPt(a, b) { return Math.abs(a[0]-b[0]) < 1e-7 && Math.abs(a[1]-b[1]) < 1e-7; }
-
-    function unirAneis(rings) {
-        if (rings.length === 1) return rings;
-        let remaining = rings.map(r => [...r]);
-        const merged = [];
-        while (remaining.length > 0) {
-            let cur = remaining.shift();
-            let changed = true;
-            while (changed) {
-                changed = false;
-                for (let i = 0; i < remaining.length; i++) {
-                    const r = remaining[i];
-                    if      (eqPt(cur[cur.length-1], r[0]))          { cur = cur.concat(r.slice(1)); }
-                    else if (eqPt(cur[cur.length-1], r[r.length-1])) { cur = cur.concat([...r].reverse().slice(1)); }
-                    else if (eqPt(cur[0], r[r.length-1]))            { cur = r.concat(cur.slice(1)); }
-                    else if (eqPt(cur[0], r[0]))                     { cur = [...r].reverse().concat(cur.slice(1)); }
-                    else continue;
-                    remaining.splice(i, 1); changed = true; break;
-                }
-            }
-            if (!eqPt(cur[0], cur[cur.length-1])) cur.push(cur[0]);
-            merged.push(cur);
-        }
-        return merged;
-    }
-
-    function overpassParaGeoJSON(data) {
-        const features = [];
-        data.elements.forEach(el => {
-            const nome = el.tags?.name || el.tags?.['name:pt'];
-            if (!nome) return;
-            if (el.type === 'way' && el.geometry?.length >= 3) {
-                const ring = el.geometry.map(p => [p.lon, p.lat]);
-                if (!eqPt(ring[0], ring[ring.length-1])) ring.push(ring[0]);
-                if (ring.length < 4) return;
-                features.push({ type:'Feature', properties:{ name:nome, colorIdx:features.length }, geometry:{ type:'Polygon', coordinates:[ring] } });
-                return;
-            }
-            if (el.type === 'relation' && el.members?.length) {
-                const outerRings = [];
-                el.members.forEach(m => {
-                    if (m.type !== 'way' || (m.role !== 'outer' && m.role !== '')) return;
-                    if (!m.geometry?.length) return;
-                    const ring = m.geometry.map(p => [p.lon, p.lat]);
-                    if (!eqPt(ring[0], ring[ring.length-1])) ring.push(ring[0]);
-                    if (ring.length >= 4) outerRings.push(ring);
-                });
-                if (!outerRings.length) return;
-                const merged = unirAneis(outerRings);
-                features.push({ type:'Feature', properties:{ name:nome, colorIdx:features.length },
-                    geometry: merged.length === 1
-                        ? { type:'Polygon', coordinates:merged }
-                        : { type:'MultiPolygon', coordinates:merged.map(r=>[r]) }
-                });
-            }
-        });
-        return { type:'FeatureCollection', features };
-    }
-
-    // ── Renderizar GeoJSON genérico ───────────────────────────────────────────
-    function renderGeoJSON(geojson, getNome, getCor, onEach) {
-        return L.geoJSON(geojson, {
+        camada = L.geoJSON(geojson, {
             style: feature => {
-                const c = getCor(feature);
-                return { fillColor:c, fillOpacity:0.32, color:c, weight:1.5, opacity:0.8 };
+                const c = cor(feature.properties.colorIdx);
+                return { fillColor: c, fillOpacity: 0.32, color: c, weight: 1.5, opacity: 0.8 };
             },
             onEachFeature: (feature, layer) => {
-                const nome = getNome(feature);
-                layer.bindTooltip(`<b>${nome}</b>`, { sticky:true, className:'tooltip-bairro', direction:'top' });
-                layer.on('mouseover', function() { this.setStyle({ fillOpacity:0.6, weight:2.5 }); });
-                layer.on('mouseout',  function() { this.setStyle({ fillOpacity:0.32, weight:1.5 }); });
-                layer.on('click',     function() { mapa.fitBounds(this.getBounds(), { padding:[50,50] }); });
-                if (onEach) onEach(feature, layer);
+                const p = feature.properties;
+                layer.bindTooltip(
+                    `<b>Cluster ${p.cluster_id + 1}</b><br>${p.total_postes} postes`,
+                    { sticky: true, className: 'tooltip-bairro', direction: 'top' }
+                );
+                layer.on('mouseover', function () { this.setStyle({ fillOpacity: 0.6, weight: 2.5 }); });
+                layer.on('mouseout',  function () { camada.resetStyle(this); });
+                layer.on('click',     function () { mapa.fitBounds(this.getBounds(), { padding: [50, 50] }); });
             }
+        }).addTo(mapa);
+
+        // Centroides
+        geojson.features.forEach(f => {
+            const p = f.properties;
+            L.circleMarker([p.centroide_lat, p.centroide_lon], {
+                radius: 4, color: cor(p.colorIdx), fillColor: cor(p.colorIdx),
+                fillOpacity: 1, weight: 2,
+            }).addTo(camada)
+              .bindTooltip(
+                `<b>Cluster ${p.cluster_id + 1}</b><br>${p.total_postes} postes`,
+                { className: 'tooltip-bairro', direction: 'top' }
+              );
         });
-    }
 
-    // ── Legenda ───────────────────────────────────────────────────────────────
-    function renderLegenda(tipo) {
-        const lista   = document.getElementById('legenda-lista');
-        const legenda = document.getElementById('legenda');
-        const titulo  = document.getElementById('legenda-titulo');
+        if (camada.getBounds().isValid())
+            mapa.fitBounds(camada.getBounds(), { padding: [60, 60] });
+
+        // Legenda
+        const k = document.getElementById('k-slider').value;
+        document.getElementById('legenda-titulo').textContent = `Clusters (K=${k})`;
+        const lista = document.getElementById('legenda-lista');
         lista.innerHTML = '';
-        if (!legendaData[tipo]?.length) { legenda.style.display = 'none'; return; }
-
-        titulo.textContent = tipo === 'bairros' ? 'Bairros' : `Clusters (K=${document.getElementById('k-slider').value})`;
-        titulo.className   = tipo === 'clusters' ? 'cluster-titulo' : '';
-
-        [...legendaData[tipo]]
-            .sort((a,b) => a.nome.localeCompare(b.nome, 'pt-BR'))
-            .forEach(b => {
+        geojson.features
+            .slice()
+            .sort((a, b) => a.properties.cluster_id - b.properties.cluster_id)
+            .forEach(f => {
+                const p = f.properties;
                 const item = document.createElement('div');
                 item.className = 'legenda-item';
                 item.innerHTML = `
-                    <div class="legenda-cor" style="background:${b.cor}"></div>
-                    <span class="legenda-nome" title="${b.nome}">${b.nome}</span>
-                    ${b.count != null ? `<span class="legenda-count">${b.count}</span>` : ''}
+                    <div class="legenda-cor" style="background:${cor(p.colorIdx)}"></div>
+                    <span class="legenda-nome">Cluster ${p.cluster_id + 1}</span>
+                    <span class="legenda-count">${p.total_postes}</span>
                 `;
                 lista.appendChild(item);
             });
-        legenda.style.display = 'block';
+        document.getElementById('legenda').style.display = 'block';
     }
 
-    // ── Carregar BAIRROS (Overpass via back) ──────────────────────────────────
-    async function buscarBairros() {
+    async function buscar() {
         const input = document.getElementById('inputCidade').value.trim();
         if (!input) return;
 
+        const k = document.getElementById('k-slider').value;
+
         mostrarLoading(true, 'GEOCODIFICANDO...');
         document.getElementById('legenda').style.display = 'none';
-        if (camadaBairros)  { mapa.removeLayer(camadaBairros);  camadaBairros  = null; }
-        if (camadaClusters) { mapa.removeLayer(camadaClusters); camadaClusters = null; }
 
         try {
-            // 1. Geocode
+            // 1. Geocode para centralizar o mapa
             const geoResp = await fetch(`${API_BASE}/api/geocode?cidade=${encodeURIComponent(input)}`);
             if (!geoResp.ok) throw new Error('Cidade não encontrada.');
-            const { lat, lon, osm_id, osm_type } = await geoResp.json();
+            const { lat, lon } = await geoResp.json();
             mapa.setView([lat, lon], 13);
 
-            // 2. Bairros OSM
-            mostrarLoading(true, 'BUSCANDO BAIRROS...');
-            const bResp = await fetch(`${API_BASE}/api/bairros?osm_id=${osm_id}&osm_type=${osm_type}`);
-            if (!bResp.ok) throw new Error('Erro ao buscar bairros.');
-            const geojson = await bResp.json();
+            // 2. Clusters K-Means (back processa CSV + clip)
+            mostrarLoading(true, `K-MEANS  K = ${k}...`);
+            const cResp = await fetch(`${API_BASE}/api/clusters?k=${k}`);
+            if (!cResp.ok) throw new Error('Erro ao buscar clusters.');
+            const geojson = await cResp.json();
 
             if (!geojson.features.length) {
-                mostrarStatus('Nenhum bairro encontrado no OSM.', 5000);
+                mostrarStatus('Nenhum cluster gerado.', 5000);
                 return;
             }
 
-            camadaBairros = renderGeoJSON(geojson,
-                f => f.properties.name,
-                f => cor(f.properties.colorIdx)
-            ).addTo(mapa);
-
-            legendaData['bairros'] = geojson.features.map(f => ({
-                nome: f.properties.name,
-                cor:  cor(f.properties.colorIdx),
-            }));
-
-            if (camadaBairros.getBounds().isValid())
-                mapa.fitBounds(camadaBairros.getBounds(), { padding:[60,60] });
-
-            modoCamada = 'bairros';
-            document.getElementById('toggle-bairros').classList.add('ativo');
-            document.getElementById('toggle-clusters').classList.remove('ativo');
-            document.getElementById('k-wrap').classList.remove('visivel');
-            renderLegenda('bairros');
-            mostrarStatus(`${geojson.features.length} bairro(s) carregado(s)`, 4000);
-
-        } catch (err) {
-            mostrarStatus(`Erro: ${err.message}`, 5000);
-            console.error(err);
-        } finally {
-            mostrarLoading(false);
-        }
-    }
-
-    // ── Carregar CLUSTERS (K-Means via back) ──────────────────────────────────
-    async function carregarClusters() {
-        const k = document.getElementById('k-slider').value;
-        mostrarLoading(true, `K-MEANS K=${k}...`);
-        if (camadaClusters) { mapa.removeLayer(camadaClusters); camadaClusters = null; }
-
-        try {
-            const resp = await fetch(`${API_BASE}/api/clusters?k=${k}`);
-            if (!resp.ok) throw new Error('Erro ao buscar clusters.');
-            const geojson = await resp.json();
-
-            camadaClusters = renderGeoJSON(geojson,
-                f => `Cluster ${f.properties.cluster_id + 1} — ${f.properties.total_postes} postes`,
-                f => cor(f.properties.colorIdx)
-            ).addTo(mapa);
-
-            // Centroides como marcadores
-            geojson.features.forEach(f => {
-                const p = f.properties;
-                L.circleMarker([p.centroide_lat, p.centroide_lon], {
-                    radius: 5, color: cor(p.colorIdx), fillColor: cor(p.colorIdx),
-                    fillOpacity: 1, weight: 2,
-                }).addTo(camadaClusters)
-                  .bindTooltip(`<b>Cluster ${p.cluster_id + 1}</b><br>${p.total_postes} postes`, {
-                    className: 'tooltip-bairro', direction: 'top',
-                });
-            });
-
-            legendaData['clusters'] = geojson.features.map(f => ({
-                nome:  `Cluster ${f.properties.cluster_id + 1}`,
-                cor:   cor(f.properties.colorIdx),
-                count: f.properties.total_postes,
-            }));
-
-            if (camadaClusters.getBounds().isValid())
-                mapa.fitBounds(camadaClusters.getBounds(), { padding:[60,60] });
-
-            renderLegenda('clusters');
-            mostrarStatus(`${geojson.features.length} clusters gerados`, 4000);
+            renderizarClusters(geojson);
+            mostrarStatus(`${geojson.features.length} clusters carregados`, 4000);
 
         } catch (err) {
             mostrarStatus(`Erro: ${err.message}`, 5000);
@@ -399,10 +240,9 @@
     }
 
     document.getElementById('inputCidade').addEventListener('keydown', e => {
-        if (e.key === 'Enter') buscarBairros();
+        if (e.key === 'Enter') buscar();
     });
 
-    // Tooltip style
     const s = document.createElement('style');
     s.textContent = `
         .tooltip-bairro {
@@ -415,7 +255,7 @@
     `;
     document.head.appendChild(s);
 
-    window.addEventListener('load', () => buscarBairros());
+    window.addEventListener('load', () => buscar());
 </script>
 </body>
 </html>
