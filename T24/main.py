@@ -5,7 +5,6 @@ from pathlib import Path
 from sklearn.cluster import KMeans
 from scipy.spatial import ConvexHull
 from shapely.geometry import Polygon, MultiPolygon, mapping
-from shapely.ops import unary_union
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -189,6 +188,10 @@ out geom;"""
     return overpass_para_geojson(resp.json())
 
 
+# Cache dos labels do último K-Means rodado
+_ultimo_estado: dict = {}   # {"k": int, "labels": np.ndarray}
+
+
 @app.get("/api/clusters")
 async def clusters(k: int = Query(15, ge=2, le=50)):
     """
@@ -200,6 +203,8 @@ async def clusters(k: int = Query(15, ge=2, le=50)):
 
     km = KMeans(n_clusters=k, random_state=42, n_init=10)
     labels = km.fit_predict(coords)
+    _ultimo_estado["k"] = k
+    _ultimo_estado["labels"] = labels
 
     features = []
     for cluster_id in range(k):
@@ -246,4 +251,33 @@ async def clusters(k: int = Query(15, ge=2, le=50)):
         })
 
     features.sort(key=lambda f: f["properties"]["total_postes"], reverse=True)
+    return {"type": "FeatureCollection", "features": features}
+
+@app.get("/api/postes/{cluster_id}")
+async def postes_cluster(cluster_id: int, k: int = Query(15, ge=2, le=50)):
+    """Retorna os postes (lat/lon) de um cluster específico como GeoJSON."""
+    df = get_postes()
+
+    # Reusar labels do cache se o k for o mesmo, senão rodar de novo
+    if _ultimo_estado.get("k") != k:
+        coords = df[["lat", "lon"]].values
+        km = KMeans(n_clusters=k, random_state=42, n_init=10)
+        labels = km.fit_predict(coords)
+        _ultimo_estado["k"] = k
+        _ultimo_estado["labels"] = labels
+    else:
+        labels = _ultimo_estado["labels"]
+
+    mask = labels == cluster_id
+    subset = df[mask]
+
+    features = [
+        {
+            "type": "Feature",
+            "properties": {"bairro": row.bairro},
+            "geometry": {"type": "Point", "coordinates": [row.lon, row.lat]},
+        }
+        for row in subset.itertuples()
+    ]
+
     return {"type": "FeatureCollection", "features": features}
