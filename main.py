@@ -2,6 +2,8 @@ import httpx
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from datetime import date, timedelta
+import random
 from sklearn.cluster import KMeans
 from scipy.spatial import ConvexHull
 from shapely.geometry import Polygon, MultiPolygon
@@ -54,7 +56,25 @@ def get_postes() -> pd.DataFrame:
     if _df_postes is None:
         if not CSV_PATH.exists():
             raise HTTPException(status_code=500, detail=f"{CSV_PATH} não encontrado.")
-        _df_postes = pd.read_csv(CSV_PATH)
+        df = pd.read_csv(CSV_PATH)
+
+        # Gera coluna de validade sintética se não existir
+        if "validade" not in df.columns:
+            random.seed(42)
+            hoje = date.today()
+            datas = []
+            for _ in range(len(df)):
+                # ~15% de postes com luminária vencida (até 90 dias atrás)
+                # ~85% com validade futura (até 3 anos à frente)
+                if random.random() < 0.15:
+                    delta = timedelta(days=random.randint(1, 90))
+                    datas.append((hoje - delta).strftime("%d/%m/%Y"))
+                else:
+                    delta = timedelta(days=random.randint(30, 1095))
+                    datas.append((hoje + delta).strftime("%d/%m/%Y"))
+            df["validade"] = datas
+
+        _df_postes = df
     return _df_postes
 
 
@@ -206,6 +226,14 @@ async def clusters(k: int = Query(15, ge=2, le=50)):
     _ultimo_estado["k"] = k
     _ultimo_estado["labels"] = labels
 
+    hoje = date.today()
+
+    def is_vencida(val_str):
+        try:
+            return pd.to_datetime(val_str, dayfirst=True).date() < hoje
+        except Exception:
+            return False
+
     features = []
     for cluster_id in range(k):
         mask = labels == cluster_id
@@ -214,6 +242,11 @@ async def clusters(k: int = Query(15, ge=2, le=50)):
             continue
 
         centroide = pts.mean(axis=0)
+        subset_cluster = df[mask]
+
+        normais     = int((subset_cluster['situacao'] == 'normal').sum())
+        com_defeito = int((subset_cluster['situacao'] != 'normal').sum())
+        vencidos    = int(subset_cluster['validade'].apply(is_vencida).sum()) if 'validade' in df.columns else 0
 
         try:
             hull = ConvexHull(pts)
@@ -238,9 +271,12 @@ async def clusters(k: int = Query(15, ge=2, le=50)):
         features.append({
             "type": "Feature",
             "properties": {
-                "cluster_id": cluster_id,
-                "colorIdx": cluster_id,
-                "total_postes": int(mask.sum()),
+                "cluster_id":    cluster_id,
+                "colorIdx":      cluster_id,
+                "total_postes":  int(mask.sum()),
+                "normais":       normais,
+                "com_defeito":   com_defeito,
+                "vencidos":      vencidos,
                 "centroide_lat": round(float(centroide[0]), 6),
                 "centroide_lon": round(float(centroide[1]), 6),
             },
@@ -270,7 +306,11 @@ async def postes_cluster(cluster_id: int, k: int = Query(15, ge=2, le=50)):
     features = [
         {
             "type": "Feature",
-            "properties": {"bairro": row.bairro, "situacao": row.situacao},
+            "properties": {
+                "bairro":   row.bairro,
+                "situacao": row.situacao,
+                "validade": row.validade if hasattr(row, "validade") else None,
+            },
             "geometry": {"type": "Point", "coordinates": [row.lon, row.lat]},
         }
         for row in subset.itertuples()
@@ -285,3 +325,26 @@ async def resumo():
     total = len(df)
     com_problema = int((df['situacao'] != 'normal').sum())
     return {"total": total, "com_problema": com_problema}
+
+
+@app.get("/api/luminarias-vencidas")
+async def luminarias_vencidas():
+    """Retorna lista de postes com luminária vencida (data de validade no passado)."""
+    df = get_postes()
+    hoje = date.today()
+
+    def is_vencida(val_str):
+        try:
+            d = pd.to_datetime(val_str, dayfirst=True).date()
+            return d < hoje
+        except Exception:
+            return False
+
+    mask = df["validade"].apply(is_vencida)
+    subset = df[mask][["bairro", "validade"]].copy()
+    subset = subset.sort_values("bairro")
+
+    return [
+        {"bairro": row.bairro, "validade": row.validade}
+        for row in subset.itertuples()
+    ]
